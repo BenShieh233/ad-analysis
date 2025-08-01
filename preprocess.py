@@ -29,7 +29,7 @@ def promoted(df: pd.DataFrame,
         return df  # 已经做过映射，直接跳过
     
     df["Day"] = pd.to_datetime(df["Day"]).dt.date
-    df["Promoted OMSID"] = df["Promoted OMSID"].astype(str)
+    df["Promoted OMSID"] = df["Promoted OMSID Number"].astype(str)
     df["Campaign ID"] = df["Campaign ID"].astype(str)
     if campaign_ids:
         df = df[df['Campaign ID'].isin(campaign_ids)]

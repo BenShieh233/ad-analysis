@@ -38,6 +38,9 @@ def plot_promoted_sku_rank(
         # 将索引列重命名为 SKU
         display_df = df_agg.reset_index().rename(columns={sku_col: 'SKU'})
     else:
+        desc_col = 'Promoted OMSID Description'
+        desc_info = df_p[[sku_col, desc_col]].drop_duplicates(subset=sku_col).set_index(sku_col)
+        df_agg = df_agg.join(desc_info)
         display_df = df_agg.reset_index().rename(columns={sku_col: 'SKU'})
 
     # 展示聚合表格
@@ -123,3 +126,4 @@ def plot_sku_trends(
         fig.update_yaxes(title_text=m1, secondary_y=False)
         fig.update_yaxes(title_text=m2, secondary_y=True)
         st.plotly_chart(fig, use_container_width=True)
+        st.dataframe(data[['Promoted OMSID', 'Promoted OMSID Description', 'Campaign ID', 'Campaign Name', 'Day', 'Clicks', 'Impressions', 'SPA ROAS', 'SPA Sales', 'Spend']])

@@ -9,8 +9,8 @@ file_configs = {
     },
     "Promoted Sales": {
         "skiprows": 4,
-        "required_cols": ["Ad Type", "Campaign ID", "Clicks", "Day", "Impressions", "Month", "Month Name", "Promoted OMSID", "SPA ROAS", 
-                          "SPA Sales", "Spend", "Week", "Year"],
+        "required_cols": ["Ad Type", "Campaign ID", "Clicks", "Day", "Impressions", "Promoted OMSID Number", "Promoted OMSID Description", "SPA ROAS", 
+                          "SPA Sales", "Spend"],
         "preprocess_fn": "promoted",
         "date_col": "Day"
     },
