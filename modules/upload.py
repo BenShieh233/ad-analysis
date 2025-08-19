@@ -71,5 +71,26 @@ def upload():
         merged = promoted(prom_df, camp_ids, sku_map_df)
         st.session_state.uploaded_data['Promoted Sales'] = merged
         st.success("已自动将 SKU Map 应用到 Promoted Sales")
-        
+
+    # 将爬取结果合并到Promoted Sales
+    if "product_results" in st.session_state and 'Promoted Sales' in st.session_state.uploaded_data:
+        product_df = st.session_state['product_results']
+        prom_df = st.session_state.uploaded_data['Promoted Sales']
+
+        # 建立映射：sku → status
+        keys = list(zip(product_df['campaign_id'], product_df['sku']))
+        values = product_df['status'] 
+        sku_campaign_to_status = dict(zip(keys, values))
+       
+        st.write(sku_campaign_to_status)
+
+        # 然后在 prom_df 中映射
+        prom_df['Promoted OMSID Number'] = prom_df['Promoted OMSID Number'].astype(str)
+        prom_df['Status'] = prom_df.apply(
+            lambda row: sku_campaign_to_status.get((row['Campaign ID'], row['Promoted OMSID Number']), "Not Found"),
+            axis=1
+        )        
+        st.dataframe(prom_df)
+        st.session_state.uploaded_data['Promoted Sales'] = prom_df
+        st.success("已自动将 active状态 应用到 Promoted Sales")
 upload()

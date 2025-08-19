@@ -18,7 +18,6 @@ def plot_promoted_sku_rank(
     """
 
     df_p = df_promoted.copy()
-
     # 1. 聚合各 SKU 指标
     agg_dict = {}
     for m in metrics:
@@ -30,6 +29,10 @@ def plot_promoted_sku_rank(
 
     # 3. 如果有映射列，合并映射信息
     mapping_cols = ["MFG Model #", "OMS THD SKU", "Product Name (120)"]
+    # 如果有 Status 列，也加入
+    if 'Status' in df_p.columns:
+        mapping_cols.append('Status')
+
     # 检查是否在原始 df 中都有
     if all(col in df_p.columns for col in mapping_cols):
         map_info = df_p[[sku_col] + mapping_cols].drop_duplicates(subset=sku_col).set_index(sku_col)
@@ -38,8 +41,12 @@ def plot_promoted_sku_rank(
         # 将索引列重命名为 SKU
         display_df = df_agg.reset_index().rename(columns={sku_col: 'SKU'})
     else:
+        # fallback
         desc_col = 'Promoted OMSID Description'
-        desc_info = df_p[[sku_col, desc_col]].drop_duplicates(subset=sku_col).set_index(sku_col)
+        cols_to_join = [sku_col, desc_col]
+        if 'Status' in df_p.columns:
+            cols_to_join.append('Status')
+        desc_info = df_p[cols_to_join].drop_duplicates(subset=sku_col).set_index(sku_col)
         df_agg = df_agg.join(desc_info)
         display_df = df_agg.reset_index().rename(columns={sku_col: 'SKU'})
 

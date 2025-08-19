@@ -79,8 +79,12 @@ def trend():
         with campaign_tabs[2]:
 
             # 在 Tab3 页面头部定义 selected_campaign
-            st.session_state['tab3_campaign'] = st.selectbox("选择 Campaign ID", df_campaign['Campaign ID'].unique())
-
+           # 让用户选择 Campaign ID，但显示 Campaign Name
+            st.session_state['tab3_campaign'] = st.selectbox(
+                "选择 Campaign ID",
+                options=df_campaign['Campaign ID'],
+                format_func=lambda x: f"{x} - {df_campaign.loc[df_campaign['Campaign ID'] == x, 'Campaign Name'].iloc[0]}"
+            )
             # 功能1
             plot_dual_metric_trends(
                 df=df_campaign,
@@ -103,7 +107,7 @@ def trend():
             if promoted is None:
                 st.warning("若要使用本功能，请检查是否已上传 Promoted Sales 文件")
                 st.stop()
-                
+
             ids = df_campaign['Campaign ID'].unique().tolist()
             # 默认选项：如果之前在 tab3 里选过，就用它；否则用第一个
             default = 0
@@ -116,7 +120,8 @@ def trend():
                 "选择 Campaign ID",
                 options=ids,
                 index=default,
-                key="tab4_selected_campaign"
+                key="tab4_selected_campaign",
+                format_func=lambda x: f"{x} - {df_campaign.loc[df_campaign['Campaign ID'] == x, 'Campaign Name'].iloc[0]}"
             )
 
             start, end = st.session_state['campaign_start'], st.session_state['campaign_end']
