@@ -82,8 +82,6 @@ def upload():
         values = product_df['status'] 
         sku_campaign_to_status = dict(zip(keys, values))
        
-        st.write(sku_campaign_to_status)
-
         # 然后在 prom_df 中映射
         prom_df['Promoted OMSID Number'] = prom_df['Promoted OMSID Number'].astype(str)
         prom_df['Status'] = prom_df.apply(
