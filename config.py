@@ -16,7 +16,7 @@ file_configs = {
     },
     "HD SKU Map": {
         "skiprows": 0,
-        "required_cols": ["OMSID", "MFG Model #", "OMS THD SKU", "Product Name (120)"],
+        "required_cols": ["OMSID", "MFG Model #", "Weekly Sales QTY", "Promoted Retail", "Inventory", "OMS THD SKU", "Product Name (120)"],
         "preprocess_fn": "map"
     },
 

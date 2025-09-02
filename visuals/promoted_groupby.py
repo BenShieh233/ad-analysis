@@ -28,7 +28,7 @@ def plot_promoted_sku_rank(
     df_agg['SPA ROAS'] = df_agg['SPA Sales'] / df_agg['Spend']
 
     # 3. 如果有映射列，合并映射信息
-    mapping_cols = ["MFG Model #", "OMS THD SKU", "Product Name (120)"]
+    mapping_cols = ["MFG Model #", "Weekly Sales QTY", "Promoted Retail", "Inventory", "OMS THD SKU", "Product Name (120)"]
     # 如果有 Status 列，也加入
     if 'Status' in df_p.columns:
         mapping_cols.append('Status')
@@ -40,6 +40,10 @@ def plot_promoted_sku_rank(
         df_agg = df_agg.join(map_info)
         # 将索引列重命名为 SKU
         display_df = df_agg.reset_index().rename(columns={sku_col: 'SKU'})
+        # 如果 Status 存在，就把它调整到第一列
+        if 'Status' in display_df.columns:
+            cols = ['Status'] + [col for col in display_df.columns if col != 'Status']
+            display_df = display_df[cols]
     else:
         # fallback
         desc_col = 'Promoted OMSID Description'
@@ -49,7 +53,10 @@ def plot_promoted_sku_rank(
         desc_info = df_p[cols_to_join].drop_duplicates(subset=sku_col).set_index(sku_col)
         df_agg = df_agg.join(desc_info)
         display_df = df_agg.reset_index().rename(columns={sku_col: 'SKU'})
-
+        if 'Status' in display_df.columns:
+            cols = ['Status'] + [col for col in display_df.columns if col != 'Status']
+            display_df = display_df[cols]
+            
     # 展示聚合表格
     st.subheader(f"{selected_campaign} 的 SKU 聚合指标表")
     st.dataframe(display_df)
@@ -91,7 +98,6 @@ def plot_sku_trends(
     """
     sku_list = df_promoted[sku_col].unique().tolist()
     mode = st.radio("选择模式", ['跨 SKU 对比同指标', '单 SKU 对比跨指标'], key='sku_trend_mode')
-
     if mode == '跨 SKU 对比同指标':
         metric = st.selectbox("选择对比指标", ['Clicks','Impressions','SPA Sales','Spend'], key='mode1_metric')
         skus = st.multiselect("选择多个 SKU", sku_list, default=sku_list[:2], key='mode1_skus')
