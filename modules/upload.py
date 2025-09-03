@@ -62,33 +62,41 @@ def upload():
         st.info("尚未上传任何通过校验的文件。")
     # 上传流程结束后，全局处理依赖关系
     # 自动将 HD SKU Map 应用到 Promoted Sales
-    if "HD SKU Map" in st.session_state.uploaded_data and 'Promoted Sales' in st.session_state.uploaded_data:
+    if (
+        "uploaded_data" in st.session_state 
+        and st.session_state.uploaded_data is not None
+        and "HD SKU Map" in st.session_state.uploaded_data 
+        and "Promoted Sales" in st.session_state.uploaded_data
+    ):
         prom_df = st.session_state.uploaded_data['Promoted Sales']
         camp_df = st.session_state.uploaded_data.get('Campaign Summary')
         camp_ids = camp_df['Campaign ID'].tolist() if camp_df is not None else None
         sku_map_df = st.session_state.uploaded_data["HD SKU Map"]
         # 重新调用预处理以合并映射
         merged = promoted(prom_df, camp_ids, sku_map_df)
+        # 存到 processed_data，而不是覆盖 uploaded_data
+        st.session_state.setdefault("processed_data", {})
         st.session_state.uploaded_data['Promoted Sales'] = merged
         st.success("已自动将 SKU Map 应用到 Promoted Sales")
 
     # 将爬取结果合并到Promoted Sales
-    if "product_results" in st.session_state and 'Promoted Sales' in st.session_state.uploaded_data:
-        product_df = st.session_state['product_results']
-        prom_df = st.session_state.uploaded_data['Promoted Sales']
+    if "product_results" in st.session_state and 'Promoted Sales' in st.session_state.uploaded_data and st.session_state.uploaded_data is not None:
+        if st.session_state['product_results']:
+            product_df = st.session_state['product_results']
+            prom_df = st.session_state.uploaded_data['Promoted Sales']
 
-        # 建立映射：sku → status
-        keys = list(zip(product_df['campaign_id'], product_df['sku']))
-        values = product_df['status'] 
-        sku_campaign_to_status = dict(zip(keys, values))
-       
-        # 然后在 prom_df 中映射
-        prom_df['Promoted OMSID Number'] = prom_df['Promoted OMSID Number'].astype(str)
-        prom_df['Status'] = prom_df.apply(
-            lambda row: sku_campaign_to_status.get((row['Campaign ID'], row['Promoted OMSID Number']), "Not Found"),
-            axis=1
-        )        
-        st.dataframe(prom_df)
-        st.session_state.uploaded_data['Promoted Sales'] = prom_df
-        st.success("已自动将 active状态 应用到 Promoted Sales")
+            # 建立映射：sku → status
+            keys = list(zip(product_df['campaign_id'], product_df['sku']))
+            values = product_df['status'] 
+            sku_campaign_to_status = dict(zip(keys, values))
+        
+            # 然后在 prom_df 中映射
+            prom_df['Promoted OMSID Number'] = prom_df['Promoted OMSID Number'].astype(str)
+            prom_df['Status'] = prom_df.apply(
+                lambda row: sku_campaign_to_status.get((row['Campaign ID'], row['Promoted OMSID Number']), "Not Found"),
+                axis=1
+            )        
+            st.dataframe(prom_df)
+            st.session_state.uploaded_data['Promoted Sales'] = prom_df
+            st.success("已自动将 active状态 应用到 Promoted Sales")
 upload()
