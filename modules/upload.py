@@ -81,7 +81,7 @@ def upload():
 
     # 将爬取结果合并到Promoted Sales
     if "product_results" in st.session_state and 'Promoted Sales' in st.session_state.uploaded_data and st.session_state.uploaded_data is not None:
-        if st.session_state['product_results']:
+        if "product_results" in st.session_state and not st.session_state['product_results'].empty:
             product_df = st.session_state['product_results']
             prom_df = st.session_state.uploaded_data['Promoted Sales']
 
