@@ -128,4 +128,4 @@ def plot_campaign_radar_ranks(
         showlegend=True,
         title=f"Campaign {selected_campaign} 指标排名雷达图"
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width=True)

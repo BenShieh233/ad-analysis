@@ -46,6 +46,18 @@ def promoted(df: pd.DataFrame,
     return df
 
 @st.cache_data
+def purchased(df: pd.DataFrame, 
+              campaign_ids: list[str] | None = None,):
+    df["Day"] = pd.to_datetime(df["Day"]).dt.date
+    df["Promoted OMSID"] = df["Promoted OMSID Number"].astype(str)
+    df["Campaign ID"] = df["Campaign ID"].astype(str)
+    df['Purchased OMSID'] = df['Purchased OMSID Number'].astype(str)
+    if campaign_ids:
+        df = df[df['Campaign ID'].isin(campaign_ids)]
+
+    return df
+
+@st.cache_data
 def hd_sku_map(df: pd.DataFrame) -> pd.DataFrame:
     df['OMSID'] = df['OMSID'].astype(str)
     df['OMS THD SKU'] = df['OMS THD SKU'].astype(str)

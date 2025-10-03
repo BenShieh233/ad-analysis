@@ -4,7 +4,8 @@ from config import file_configs
 from visuals.campaign_ranking import get_ranked_campaigns, plot_campaign_totals, plot_campaign_trends, plot_metric_pie_charts
 from visuals.campaign_fields import plot_dual_metric_trends, plot_campaign_radar_ranks
 from visuals.promoted_groupby import plot_promoted_sku_rank, plot_sku_trends
-
+from visuals.promoted_sku_ranking import plot_total_promoted_bars, plot_promoted_daily_lines
+from visuals.promoted_distributions import plot_promoted_sunburst
 def trend():
     if "uploaded_data" not in st.session_state or not st.session_state.uploaded_data:
         st.warning("尚未上传任何数据，请先在“文件上传页”中完成文件上传。")
@@ -19,7 +20,9 @@ def trend():
     if promoted is not None and not promoted.empty:
         promoted_date = file_configs['Promoted Sales']['date_col']
 
-
+    purchased = data.get('Purchased Sales')
+    if purchased is not None and not purchased.empty:
+        purchased_date = file_configs['Purchased Sales']['date_col']
     # with tabs[0]:
     #     campaign_tab_selection = st.pills("选择要广告分析的功能", ['整体趋势折线图', '单支广告参数对比图'])
     #     df_campaign = time_filters(campaign, campaign_date, key_prefix="campaign")
@@ -77,12 +80,12 @@ def trend():
                                    name_map
                                    )
         with campaign_tabs[2]:
-
+                
             # 在 Tab3 页面头部定义 selected_campaign
            # 让用户选择 Campaign ID，但显示 Campaign Name
             st.session_state['tab3_campaign'] = st.selectbox(
                 "选择 Campaign ID",
-                options=df_campaign['Campaign ID'],
+                options=df_campaign['Campaign ID'].unique(),
                 format_func=lambda x: f"{x} - {df_campaign.loc[df_campaign['Campaign ID'] == x, 'Campaign Name'].iloc[0]}"
             )
             # 功能1
@@ -151,7 +154,36 @@ def trend():
         if promoted is None:
             st.warning("请检查是否已上传 Promoted Sales 文件")
             st.stop()
-
+        if purchased is None:
+            st.warning("请检查是否已上传 Purchased Sales 文件")
+            st.stop()
+        promoted_sku_tabs = st.tabs([
+            "📈 SKU销售额分析",
+            "💸 Promoted SKU 对比 Non-Promoted SKU" 
+        ])
         df_promoted = time_filters(promoted, promoted_date, key_prefix="promoted")
+        df_purchased = purchased.copy()
+        df_merged = df_promoted.merge(
+            df_purchased,
+            on = ['Day', 'Campaign ID', 'Promoted OMSID'],
+            how = 'left'
+        )
+        df_bars = df_merged[['Day', 'Promoted OMSID',
+                               'Purchased OMSID', 'SPA Sales_y']]
+        if 'HD SKU Map' in st.session_state.get('uploaded_data', {}):
+            df_sunburst = df_merged[['Day', 'Promoted OMSID', 
+                                 'Purchased OMSID', 'SPA Sales_y',
+                                 'MFG Model #', 'Weekly Sales QTY', 'Promoted Retail',
+                                 'Inventory', 'Product Name (120)']]
+        else:
+            df_sunburst = df_merged[['Day', 'Promoted OMSID', 
+                                 'Purchased OMSID', 'SPA Sales_y']]
+            
+        with promoted_sku_tabs[0]:
+            top_promoted, color_map = plot_total_promoted_bars(df_bars) 
+            plot_promoted_daily_lines(df_bars, top_promoted, color_map) 
+
+        with promoted_sku_tabs[1]:
+            plot_promoted_sunburst(df_merged)
 
 trend()

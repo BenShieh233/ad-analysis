@@ -2,11 +2,12 @@ import streamlit as st
 import pandas as pd
 from config import file_configs
 from utils.validate import validate_dataframe
-from preprocess import campaign, promoted, hd_sku_map
+from preprocess import campaign, promoted, purchased, hd_sku_map
 
 PREPROCESS_MAP = {
     "campaign": campaign,
     "promoted": promoted,
+    "purchased": purchased,
     "map": hd_sku_map
 }
 
@@ -41,6 +42,10 @@ def upload():
                         campaign_ids = campaign_df['Campaign ID'].tolist() if campaign_df is not None else None
                         sku_map_df = st.session_state.uploaded_data.get('HD SKU Map')
                         df = PREPROCESS_MAP[fn_key](df, campaign_ids, sku_map_df)
+                    elif fn_key == 'purchased':
+                        campaign_df = st.session_state.uploaded_data.get('Campaign Summary')
+                        campaign_ids = campaign_df['Campaign ID'].tolist() if campaign_df is not None else None
+                        df = PREPROCESS_MAP[fn_key](df, campaign_ids)
 
                     elif fn_key in PREPROCESS_MAP:
                         df = PREPROCESS_MAP[fn_key](df)
@@ -50,13 +55,12 @@ def upload():
 
             except Exception as e:
                 st.error(f"读取“{name}”时出错，请检查格式 {e}")
-
     st.markdown("---")
     st.subheader("🗄️ 已上传并持久化的数据")
     if st.session_state.uploaded_data:
         for name, df in st.session_state.uploaded_data.items():
             st.write(f"**{name}**：{len(df)} 行")
-            st.dataframe(df.head())
+            st.dataframe(df)
             st.write("-----")
     else:
         st.info("尚未上传任何通过校验的文件。")
@@ -81,7 +85,8 @@ def upload():
 
     # 将爬取结果合并到Promoted Sales
     if "product_results" in st.session_state and 'Promoted Sales' in st.session_state.uploaded_data and st.session_state.uploaded_data is not None:
-        if "product_results" in st.session_state and not st.session_state['product_results'].empty:
+        product_df = st.session_state.get("product_results")
+        if isinstance(product_df, pd.DataFrame) and not product_df.empty:
             product_df = st.session_state['product_results']
             prom_df = st.session_state.uploaded_data['Promoted Sales']
 
