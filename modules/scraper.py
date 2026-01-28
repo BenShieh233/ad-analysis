@@ -6,25 +6,26 @@ import streamlit as st
 # 提取单个产品的函数
 
 headers = {
-  "Accept": "*/*",
-  "Accept-Encoding": "gzip, deflate, br, zstd",
-  "Accept-Language": "en-US,en;q=0.9",
-  "Cache-Control": "no-cache",
-  "Connection": "keep-alive",
-  "Content-Type": "application/json",
-  "Cookie": "__stripe_mid=6eff1869-934d-445a-9deb-fedc84931d84c1b632; gatewayaffinityCORS=e9a07720205d5c12d3ee611e76535f1a; gatewayaffinity=e9a07720205d5c12d3ee611e76535f1a; csrftoken=RaW0cFThnwhnzzK8NKZ22rkuGqhkCaeNS0LgXAO3R2M9pzLxzfJRiovHdqvGRdgx; sessionid=acyf7nw5zqq9dhzpv207av8qujq7ltu1; __stripe_sid=5e6c615a-2174-4b98-88a1-e0260a3e16c9759fe5; _dd_s=logs=1&id=164de316-5a5a-4f0a-a470-dbaefaee5db1&created=1747089896375&expire=1747090871495",
-  "Host": "us.orangeapronmedia.com",
-  "Pragma": "no-cache",
-  "Referer": "https://us.orangeapronmedia.com/r/33602/campaign/details/59130",
-  "Sec-Ch-Ua": "\"Not A(Brand\";v=\"8\", \"Chromium\";v=\"132\", \"Google Chrome\";v=\"132\"",
-  "Sec-Ch-Ua-Mobile": "?0",
-  "Sec-Ch-Ua-Platform": "\"Windows\"",
-  "Sec-Fetch-Dest": "empty",
-  "Sec-Fetch-Mode": "cors",
-  "Sec-Fetch-Site": "same-origin",
-  "Sentry-Trace": "016b28d09af34ddf967a96547ce0bc87-94bd87855a466b7f-1",
-  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
-  "X-Csrftoken": "RaW0cFThnwhnzzK8NKZ22rkuGqhkCaeNS0LgXAO3R2M9pzLxzfJRiovHdqvGRdgx"
+  "accept": "*/*",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
+  "active-user-role": "offsite_self_serve",
+  "baggage": "sentry-environment=production,sentry-public_key=cf4f0f8b8d8c4363b447c22ad88f1f88,sentry-trace_id=cee85ae44ab942bfb043f214c00e6a52,sentry-replay_id=6b40ff0345fa40839cb906c1133bb581,sentry-transaction=%2Fr%2F%3AstoreId%2Fcampaign%2Fdetails%2F%3AcampaignId,sentry-sampled=true,sentry-sample_rand=0.22958139808970812,sentry-sample_rate=1",
+  "cache-control": "no-cache",
+  "content-type": "application/json",
+  "cookie": "__stripe_mid=6eff1869-934d-445a-9deb-fedc84931d84c1b632; ajs_anonymous_id=b73b63d3-ed7d-44ef-b819-66177f184ec6; ajs_user_id=34217; ajs_group_id=33602; _hjSessionUser_3929290=eyJpZCI6ImZjYjkxMjgyLTM0YzgtNWUzYS1hMzljLWJhZjljNjYxMGU2NSIsImNyZWF0ZWQiOjE3NTMxMjg0Mzc4NDYsImV4aXN0aW5nIjp0cnVlfQ==; _cioid=34217; _ga=GA1.2.324959639.1755098067; ajs_user_id=34217; ajs_anonymous_id=b73b63d3-ed7d-44ef-b819-66177f184ec6; csrftoken=Yr6tINcbx5lPQ9ugW6txDv0Hj3xtdukXgYC21oiU2rLloFMlS3MjUlkPEjbY1OlJ; sessionid=nmfr68d51y5xmn96vrg0gkm1opzjro7u; _hjSession_3929290=eyJpZCI6ImQ4OGYzMDc4LWM2ZjYtNDhlOC04NTYzLWYzMTg0ZmNmMjE0OSIsImMiOjE3Njk2Mzg1ODgyNTAsInMiOjEsInIiOjEsInNiIjowLCJzciI6MCwic2UiOjAsImZzIjowLCJzcCI6MX0=; _hjHasCachedUserAttributes=true; _hjUserAttributesHash=147bbddd533807c7cc574acc4779e548; gatewayaffinityCORS=8063d6d775d022b0e0f871674182961d; gatewayaffinity=8063d6d775d022b0e0f871674182961d; _dd_s=logs=1&id=443b1e36-3780-45fe-8350-553005a41306&created=1769641427865&expire=1769642380778",
+  "pragma": "no-cache",
+  "priority": "u=1, i",
+  "referer": "https://us.orangeapronmedia.com/r/33602/campaign/details/115649",
+  "sec-ch-ua": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\"",
+  "sec-ch-ua-mobile": "?0",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "sec-fetch-dest": "empty",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-site": "same-origin",
+  "sentry-trace": "cee85ae44ab942bfb043f214c00e6a52-b3c0a01598b98c45-1",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+  "x-csrftoken": "Yr6tINcbx5lPQ9ugW6txDv0Hj3xtdukXgYC21oiU2rLloFMlS3MjUlkPEjbY1OlJ"
 }
 
 
@@ -95,12 +96,15 @@ def scraper():
                 base_referer = "https://us.orangeapronmedia.com/r/33602/campaign/details/{}"
                 for index, campaign_id in enumerate(campaign_ids):
                     url = base_url.format(campaign_id)
-                    headers["Referer"] = base_referer.format(campaign_id)
+                    headers["referer"] = base_referer.format(campaign_id)
+                    st.write("campaign_id raw:", campaign_id, type(campaign_id))
+                    st.write("url:", url)
 
                     response = requests.get(url, headers=headers)
 
                     if response.status_code != 200:
                         st.write(response.status_code)
+                        st.write(response.text)
                         continue
                     
                     responses[campaign_id] = response.json().get('results')

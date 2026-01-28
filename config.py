@@ -21,7 +21,7 @@ file_configs = {
     },
     "Purchased Sales": {
         "skiprows": 4,
-        "required_cols": ["Ad Type", "Campaign ID", "Customer Type", "Day", "Promoted OMSID Number", "Purchased OMSID Description", "Purchased OMSID Number", 
+        "required_cols": ["Ad Type", "Campaign ID", "Day", "Promoted OMSID Number", "Purchased OMSID Description", "Purchased OMSID Number", 
                           "Purchased SKU Description", "SPA Sales", "Transaction Type"],
         "preprocess_fn": "purchased",
         "date_col": "Day"
