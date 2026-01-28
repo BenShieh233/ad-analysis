@@ -97,14 +97,11 @@ def scraper():
                 for index, campaign_id in enumerate(campaign_ids):
                     url = base_url.format(campaign_id)
                     headers["referer"] = base_referer.format(campaign_id)
-                    st.write("campaign_id raw:", campaign_id, type(campaign_id))
-                    st.write("url:", url)
 
                     response = requests.get(url, headers=headers)
 
                     if response.status_code != 200:
                         st.write(response.status_code)
-                        st.write(response.text)
                         continue
                     
                     responses[campaign_id] = response.json().get('results')
