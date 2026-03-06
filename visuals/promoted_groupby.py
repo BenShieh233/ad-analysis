@@ -4,6 +4,17 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+
+def move_rank_cols_to_front(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    如果存在 page_no_sponsored / page_no_organic，则把它们移动到最前面。
+    保持其他列顺序不变。
+    """
+    front_cols = [col for col in ["page_no_sponsored", "page_no_organic"] if col in df.columns]
+    other_cols = [col for col in df.columns if col not in front_cols]
+    return df[front_cols + other_cols]
+
+
 def plot_promoted_sku_rank(
     df_promoted: pd.DataFrame,
     selected_campaign: str,
@@ -18,6 +29,7 @@ def plot_promoted_sku_rank(
     """
 
     df_p = df_promoted.copy()
+
     # 1. 聚合各 SKU 指标
     agg_dict = {}
     for m in metrics:
@@ -28,19 +40,31 @@ def plot_promoted_sku_rank(
     df_agg['SPA ROAS'] = df_agg['SPA Sales'] / df_agg['Spend']
 
     # 3. 如果有映射列，合并映射信息
-    mapping_cols = ["MFG Model #", "Weekly Sales QTY", "Promoted Retail", "Inventory", "OMS THD SKU", "Product Name (120)"]
+    mapping_cols = [
+        "MFG Model #",
+        "Weekly Sales QTY",
+        "Promoted Retail",
+        "Inventory",
+        "OMS THD SKU",
+        "Product Name (120)"
+    ]
+
     # 如果有 Status 列，也加入
     if 'Status' in df_p.columns:
         mapping_cols.append('Status')
 
+    # 如果有 rank 分布列，也加入
+    for col in ['page_no_sponsored', 'page_no_organic']:
+        if col in df_p.columns:
+            mapping_cols.append(col)
+
     # 检查是否在原始 df 中都有
     if all(col in df_p.columns for col in mapping_cols):
         map_info = df_p[[sku_col] + mapping_cols].drop_duplicates(subset=sku_col).set_index(sku_col)
-        # 将 map_info 加到 agg
         df_agg = df_agg.join(map_info)
-        # 将索引列重命名为 SKU
         display_df = df_agg.reset_index().rename(columns={sku_col: 'SKU'})
-        # 如果 Status 存在，就把它调整到第一列
+
+        # Status 放前
         if 'Status' in display_df.columns:
             cols = ['Status'] + [col for col in display_df.columns if col != 'Status']
             display_df = display_df[cols]
@@ -48,18 +72,29 @@ def plot_promoted_sku_rank(
         # fallback
         desc_col = 'Promoted OMSID Description'
         cols_to_join = [sku_col, desc_col]
+
         if 'Status' in df_p.columns:
             cols_to_join.append('Status')
+
+        for col in ['page_no_sponsored', 'page_no_organic']:
+            if col in df_p.columns:
+                cols_to_join.append(col)
+
         desc_info = df_p[cols_to_join].drop_duplicates(subset=sku_col).set_index(sku_col)
         df_agg = df_agg.join(desc_info)
         display_df = df_agg.reset_index().rename(columns={sku_col: 'SKU'})
+
         if 'Status' in display_df.columns:
             cols = ['Status'] + [col for col in display_df.columns if col != 'Status']
             display_df = display_df[cols]
-            
+
+    # 如果存在 rank 列，则移到最前
+    display_df = move_rank_cols_to_front(display_df)
+
     # 展示聚合表格
     st.subheader(f"{selected_campaign} 的 SKU 聚合指标表")
     st.dataframe(display_df)
+
     # 3. 绘制饼图：除 SPA ROAS 外
     st.subheader("SKU 指标占比饼图")
     labels = df_agg.index.tolist()
@@ -78,11 +113,11 @@ def plot_promoted_sku_rank(
                 color=labels,
                 color_discrete_map=color_map,
                 title=f"{m} 分布",
-                hole=0.4  # 设置为环状图
-
+                hole=0.4
             )
             fig.update_traces(textinfo='percent+label')
             st.plotly_chart(fig, use_container_width=True)
+
 
 def plot_sku_trends(
     df_promoted: pd.DataFrame,
@@ -98,10 +133,12 @@ def plot_sku_trends(
     """
     sku_list = df_promoted[sku_col].unique().tolist()
     mode = st.radio("选择模式", ['跨 SKU 对比同指标', '单 SKU 对比跨指标'], key='sku_trend_mode')
+
     if mode == '跨 SKU 对比同指标':
-        metric = st.selectbox("选择对比指标", ['Clicks','Impressions','SPA Sales','Spend'], key='mode1_metric')
+        metric = st.selectbox("选择对比指标", ['Clicks', 'Impressions', 'SPA Sales', 'Spend'], key='mode1_metric')
         skus = st.multiselect("选择多个 SKU", sku_list, default=sku_list[:2], key='mode1_skus')
         data = df_promoted[df_promoted[sku_col].isin(skus)]
+
         fig = px.line(
             data,
             x=date_col,
@@ -114,12 +151,14 @@ def plot_sku_trends(
 
     else:
         sku = st.selectbox("选择 SKU", sku_list, key='mode2_sku')
-        metrics = ['Clicks','Impressions','SPA Sales','Spend']
+        metrics = ['Clicks', 'Impressions', 'SPA Sales', 'Spend']
         col1, col2 = st.columns(2)
+
         with col1:
             m1 = st.selectbox("第一个指标", metrics, key='mode2_m1')
         with col2:
             m2 = st.selectbox("第二个指标", [m for m in metrics if m != m1], key='mode2_m2')
+
         data = df_promoted[df_promoted[sku_col] == sku]
 
         # 使用双 y 轴折线图
@@ -139,4 +178,23 @@ def plot_sku_trends(
         fig.update_yaxes(title_text=m1, secondary_y=False)
         fig.update_yaxes(title_text=m2, secondary_y=True)
         st.plotly_chart(fig, use_container_width=True)
-        st.dataframe(data[['Promoted OMSID', 'Promoted OMSID Description', 'Campaign ID', 'Campaign Name', 'Day', 'Clicks', 'Impressions', 'SPA ROAS', 'SPA Sales', 'Spend']])
+
+        detail_cols = [
+            'Promoted OMSID',
+            'Promoted OMSID Description',
+            'Campaign ID',
+            'Campaign Name',
+            'Day',
+            'Clicks',
+            'Impressions',
+            'SPA ROAS',
+            'SPA Sales',
+            'Spend'
+        ]
+
+        # 如果存在这两列，就加入明细表，并放最前面
+        optional_front_cols = [col for col in ['page_no_sponsored', 'page_no_organic'] if col in data.columns]
+        final_cols = optional_front_cols + [col for col in detail_cols if col in data.columns]
+
+        detail_df = data[final_cols].copy()
+        st.dataframe(detail_df)

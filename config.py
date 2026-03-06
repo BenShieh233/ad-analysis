@@ -9,7 +9,7 @@ file_configs = {
     },
     "Promoted Sales": {
         "skiprows": 4,
-        "required_cols": ["Ad Type", "Campaign ID", "Clicks", "Day", "Impressions", "Promoted OMSID Number", "Promoted OMSID Description", "SPA ROAS", 
+        "required_cols": ["Campaign ID", "Clicks", "Day", "Impressions", "Promoted OMSID Number", "Promoted OMSID Description", "SPA ROAS", 
                           "SPA Sales", "Spend"],
         "preprocess_fn": "promoted",
         "date_col": "Day"
@@ -21,10 +21,33 @@ file_configs = {
     },
     "Purchased Sales": {
         "skiprows": 4,
-        "required_cols": ["Ad Type", "Campaign ID", "Day", "Promoted OMSID Number", "Purchased OMSID Description", "Purchased OMSID Number", 
+        "required_cols": ["Campaign ID", "Day", "Promoted OMSID Number", "Purchased OMSID Description", "Purchased OMSID Number", 
                           "Purchased SKU Description", "SPA Sales", "Transaction Type"],
         "preprocess_fn": "purchased",
         "date_col": "Day"
+    },
+    "Daily Rank": {
+        "skiprows": 0,
+        "required_cols": [
+        "scraped_date",
+        "order_global",
+        "page_no",
+        "pos_in_page",
+        "label_raw",
+        "is_sponsored",
+        "item_id",
+        "brand_name",
+        "parent_id",
+        "canonical_url",
+        "product_label",
+        "store_sku_number",
+        "model_number",
+        "price",
+        "original_price",
+        "avg_rating",
+        "total_reviews",
+        "inventory"
+    ], 
+        "preprocess_fn": "rank"
     }
-
 }

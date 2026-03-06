@@ -6,26 +6,26 @@ import streamlit as st
 # 提取单个产品的函数
 
 headers = {
-  "accept": "*/*",
-  "accept-encoding": "gzip, deflate, br, zstd",
-  "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
-  "active-user-role": "offsite_self_serve",
-  "baggage": "sentry-environment=production,sentry-public_key=cf4f0f8b8d8c4363b447c22ad88f1f88,sentry-trace_id=cee85ae44ab942bfb043f214c00e6a52,sentry-replay_id=6b40ff0345fa40839cb906c1133bb581,sentry-transaction=%2Fr%2F%3AstoreId%2Fcampaign%2Fdetails%2F%3AcampaignId,sentry-sampled=true,sentry-sample_rand=0.22958139808970812,sentry-sample_rate=1",
-  "cache-control": "no-cache",
-  "content-type": "application/json",
-  "cookie": "__stripe_mid=6eff1869-934d-445a-9deb-fedc84931d84c1b632; ajs_anonymous_id=b73b63d3-ed7d-44ef-b819-66177f184ec6; ajs_user_id=34217; ajs_group_id=33602; _hjSessionUser_3929290=eyJpZCI6ImZjYjkxMjgyLTM0YzgtNWUzYS1hMzljLWJhZjljNjYxMGU2NSIsImNyZWF0ZWQiOjE3NTMxMjg0Mzc4NDYsImV4aXN0aW5nIjp0cnVlfQ==; _cioid=34217; _ga=GA1.2.324959639.1755098067; ajs_user_id=34217; ajs_anonymous_id=b73b63d3-ed7d-44ef-b819-66177f184ec6; csrftoken=Yr6tINcbx5lPQ9ugW6txDv0Hj3xtdukXgYC21oiU2rLloFMlS3MjUlkPEjbY1OlJ; sessionid=nmfr68d51y5xmn96vrg0gkm1opzjro7u; _hjSession_3929290=eyJpZCI6ImQ4OGYzMDc4LWM2ZjYtNDhlOC04NTYzLWYzMTg0ZmNmMjE0OSIsImMiOjE3Njk2Mzg1ODgyNTAsInMiOjEsInIiOjEsInNiIjowLCJzciI6MCwic2UiOjAsImZzIjowLCJzcCI6MX0=; _hjHasCachedUserAttributes=true; _hjUserAttributesHash=147bbddd533807c7cc574acc4779e548; gatewayaffinityCORS=8063d6d775d022b0e0f871674182961d; gatewayaffinity=8063d6d775d022b0e0f871674182961d; _dd_s=logs=1&id=443b1e36-3780-45fe-8350-553005a41306&created=1769641427865&expire=1769642380778",
-  "pragma": "no-cache",
-  "priority": "u=1, i",
-  "referer": "https://us.orangeapronmedia.com/r/33602/campaign/details/115649",
-  "sec-ch-ua": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\"",
-  "sec-ch-ua-mobile": "?0",
-  "sec-ch-ua-platform": "\"Windows\"",
-  "sec-fetch-dest": "empty",
-  "sec-fetch-mode": "cors",
-  "sec-fetch-site": "same-origin",
-  "sentry-trace": "cee85ae44ab942bfb043f214c00e6a52-b3c0a01598b98c45-1",
-  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
-  "x-csrftoken": "Yr6tINcbx5lPQ9ugW6txDv0Hj3xtdukXgYC21oiU2rLloFMlS3MjUlkPEjbY1OlJ"
+    "accept": "application/json",
+    "accept-encoding": "gzip, deflate, br, zstd",
+    "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
+    "active-user-role": "offsite_self_serve",
+    "baggage": "sentry-environment=production,sentry-public_key=cf4f0f8b8d8c4363b447c22ad88f1f88,sentry-trace_id=6daee48c51a141aabf1b17440855741d,sentry-replay_id=f5d1414bcb2845649d29456e13136fb8,sentry-transaction=%2Fr%2F%3AstoreId%2Fcampaign%2Fdetails%2F%3AcampaignId,sentry-sampled=true,sentry-sample_rand=0.4349195206881652,sentry-sample_rate=1",
+    "cache-control": "no-cache",
+    "content-type": "application/json",
+    "cookie": "__stripe_mid=6eff1869-934d-445a-9deb-fedc84931d84c1b632; ajs_anonymous_id=b73b63d3-ed7d-44ef-b819-66177f184ec6; ajs_user_id=34217; ajs_group_id=33602; _hjSessionUser_3929290=eyJpZCI6ImZjYjkxMjgyLTM0YzgtNWUzYS1hMzljLWJhZjljNjYxMGU2NSIsImNyZWF0ZWQiOjE3NTMxMjg0Mzc4NDYsImV4aXN0aW5nIjp0cnVlfQ==; _cioid=34217; _ga=GA1.2.324959639.1755098067; ajs_user_id=34217; ajs_anonymous_id=b73b63d3-ed7d-44ef-b819-66177f184ec6; gatewayaffinityCORS=eb6c397b2dd93891a62fc56a22511c9b; gatewayaffinity=eb6c397b2dd93891a62fc56a22511c9b; csrftoken=HSJNRliEHMp3QLnYtWVkQfe9YCBchhazl9bh1UShBhO9SdzxRyDP8No1RbVEMFDD; sessionid=1l91x1vwm2xyq44wrm5wnsurh55y6nyf; _hjSession_3929290=eyJpZCI6IjY0ZjJmZmE3LWFiODItNDBmYy1hMmQ4LTcwM2M0NGNmM2RiZiIsImMiOjE3NzI4MTc3NjMwMzQsInMiOjEsInIiOjEsInNiIjowLCJzciI6MCwic2UiOjAsImZzIjowLCJzcCI6MH0=; _hjHasCachedUserAttributes=true; _hjUserAttributesHash=147bbddd533807c7cc574acc4779e548; _dd_s=logs=1&id=bfc0ba76-2587-4950-802c-25c6d46caa6f&created=1772817763688&expire=1772820096523",
+    "pragma": "no-cache",
+    "priority": "u=1, i",
+    "referer": "https://us.orangeapronmedia.com/r/33602/campaign/details/122403",
+    "sec-ch-ua": '"Not:A-Brand";v="99", "Google Chrome";v="145", "Chromium";v="145"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Windows"',
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-origin",
+    "sentry-trace": "6daee48c51a141aabf1b17440855741d-8e079938f667ac6c-1",
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "x-csrftoken": "HSJNRliEHMp3QLnYtWVkQfe9YCBchhazl9bh1UShBhO9SdzxRyDP8No1RbVEMFDD"
 }
 
 
