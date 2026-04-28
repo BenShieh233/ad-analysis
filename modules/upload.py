@@ -1,5 +1,4 @@
 import os
-import pickle
 import streamlit as st
 import pandas as pd
 from config import file_configs
@@ -18,27 +17,6 @@ PERSIST_DIR = "persist_data"
 PERSIST_FILE = os.path.join(PERSIST_DIR, "uploaded_data.pkl")
 
 
-def load_persisted_data():
-    if os.path.exists(PERSIST_FILE):
-        try:
-            with open(PERSIST_FILE, "rb") as f:
-                data = pickle.load(f)
-            if isinstance(data, dict):
-                return data
-        except Exception as e:
-            st.warning(f"读取持久化数据失败：{e}")
-    return {}
-
-
-def save_persisted_data(data: dict):
-    try:
-        os.makedirs(PERSIST_DIR, exist_ok=True)
-        with open(PERSIST_FILE, "wb") as f:
-            pickle.dump(data, f)
-    except Exception as e:
-        st.error(f"保存持久化数据失败：{e}")
-
-
 def clear_persisted_data():
     try:
         if os.path.exists(PERSIST_FILE):
@@ -50,26 +28,30 @@ def clear_persisted_data():
 def upload():
     st.header("📥 上传广告数据文件")
 
-    # 初始化 uploaded_data：优先从本地持久化读取
+    # 仅使用当前 Streamlit session，避免上一个使用者的数据被下一个使用者看到。
     if "uploaded_data" not in st.session_state:
-        st.session_state.uploaded_data = load_persisted_data()
+        st.session_state.uploaded_data = {}
 
-    # 可选：加一个清空持久化按钮
+    if "upload_reset_token" not in st.session_state:
+        st.session_state.upload_reset_token = 0
+
     col1, col2 = st.columns([1, 1])
     with col1:
-        if st.button("🗑️ 清空已持久化数据"):
+        if st.button("🗑️ 清空当前会话数据"):
             st.session_state.uploaded_data = {}
+            st.session_state.pop("product_results", None)
+            st.session_state.upload_reset_token += 1
             clear_persisted_data()
-            st.success("已清空本地持久化数据")
+            st.success("已清空当前会话数据")
             st.rerun()
     with col2:
-        st.caption(f"持久化文件：{PERSIST_FILE}")
+        st.caption("上传数据只保存在当前会话；不会自动读取或写入本地持久化文件。")
 
     for name, cfg in file_configs.items():
         uploaded_file = st.file_uploader(
             label=f"上传 {name}",
             type=["xlsx", "xls"],
-            key=f"uploader_{name}"
+            key=f"uploader_{name}_{st.session_state.upload_reset_token}"
         )
 
         if uploaded_file is not None:
@@ -102,13 +84,12 @@ def upload():
                 st.success(f"{name} 上传并预处理完成，共 {len(df)} 行")
 
                 st.session_state.uploaded_data[name] = df
-                save_persisted_data(st.session_state.uploaded_data)
 
             except Exception as e:
                 st.error(f"读取“{name}”时出错，请检查格式：{e}")
 
     st.markdown("---")
-    st.subheader("🗄️ 已上传并持久化的数据")
+    st.subheader("🗄️ 已上传的数据（当前会话）")
 
     if st.session_state.uploaded_data:
         for name, df in st.session_state.uploaded_data.items():
@@ -133,7 +114,6 @@ def upload():
         merged = promoted(prom_df, camp_ids, sku_map_df)
 
         st.session_state.uploaded_data["Promoted Sales"] = merged
-        save_persisted_data(st.session_state.uploaded_data)
 
         st.success("已自动将 SKU Map 应用到 Promoted Sales")
 
@@ -168,7 +148,6 @@ def upload():
             )
 
             st.session_state.uploaded_data["Promoted Sales"] = prom_df
-            save_persisted_data(st.session_state.uploaded_data)
 
             st.success("已自动将 active状态 应用到 Promoted Sales")
 
@@ -213,7 +192,6 @@ def upload():
             prom_df = prom_df.drop(columns=["item_id"], errors="ignore")
 
             st.session_state.uploaded_data["Promoted Sales"] = prom_df
-            save_persisted_data(st.session_state.uploaded_data)
 
             st.success("已自动将 Daily Rank 的 page_no_sponsored / page_no_organic 合并到 Promoted Sales")
 
